@@ -9,12 +9,22 @@
 
 ## 사용법
 
-```bash
-./app.py
+`.env` 파일에 이 프로그램을 실행할 컴퓨터의 MAC address와 라우터 비밀번호를 확인할 때 사용할 비밀번호를 기록해주세요.
+
+```
+MY_MAC_ADDR=00:00:00:00:00:00
+PW=0000
 ```
 
 ```bash
-./app.py -h
+python3 app.py
+```
+
+또는
+
+```bash
+sudo chmod +x ./app.py
+./app.py
 ```
 
 ## 목표
