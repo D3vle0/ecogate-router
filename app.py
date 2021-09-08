@@ -2,10 +2,14 @@
 import requests
 import json
 import sys
+from dotenv import load_dotenv
+import os
 import socket
+from termcolor import colored
 
 ROUTER_IP_ADDR = "192.168.255.1"
 URL = f"http://{ROUTER_IP_ADDR}/cgi-bin/meco_web_cgi"
+load_dotenv(verbose=True)
 
 cookies = {
     "LiT": "U",
@@ -32,13 +36,13 @@ headers = {
 }
 
 def getHostname(i):
-    if i["ip_addr"] == "0.0.0.0":
+    if i["ip_addr"] == "0.0.0.0" and i["mac_addr"] == os.getenv("MY_MAC_ADDR"):
         return socket.gethostname()
     return i['hostname']
 
 if len(sys.argv) == 1:
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getDataUsageInfo"})
-    print("🚀 Ecogate Router Info Viewer\n")
+    print(colored("🚀 Ecogate Router Info Viewer\n", "green"))
     print("===== Basic Information =====")
     print(f"🔥 Data Usage: {int((json.loads(response.text))['lgdatainfo']['mdatause'])/1000} MB")
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getLanInfo"})
@@ -48,10 +52,22 @@ if len(sys.argv) == 1:
         print(f"💻 Connected Hosts: ", end="")
     print(", ".join(map(getHostname, json.loads(response.text)["wifi2Ghz"]["conn_client"]["conn_list"])))
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getWWanInfo"})
-    print(f"⏰ Uptime: {json.loads(response.text)['info']['h']}h {json.loads(response.text)['info']['m']}m {json.loads(response.text)['info']['s']}s")
+    uptime_hour = int(json.loads(response.text)['info']['h'])
+    if uptime_hour > 8:
+        print(colored(f"⏰ Uptime: {str(uptime_hour)}h {json.loads(response.text)['info']['m']}m {json.loads(response.text)['info']['s']}s", "red"))
+    elif uptime_hour >= 5:
+        print(colored(f"⏰ Uptime: {str(uptime_hour)}h {json.loads(response.text)['info']['m']}m {json.loads(response.text)['info']['s']}s", "yellow"))
+    else:
+        print(colored(f"⏰ Uptime: {str(uptime_hour)}h {json.loads(response.text)['info']['m']}m {json.loads(response.text)['info']['s']}s", "green"))
     # d 추가할것
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getIndicatorInfo"})
-    print(f"🔋 Battery: {json.loads(response.text)['info']['disp_bat_per']}%\n")
+    battery = int(json.loads(response.text)['info']['disp_bat_per'])
+    if battery >= 60:
+        print(colored(f"🔋 Battery: {battery}%\n", "green"))
+    elif battery >= 30 and battery < 60:
+        print(colored(f"🔋 Battery: {battery}%\n", "yellow"))
+    else:
+        print(colored(f"🔋 Battery: {battery}%\n", "red"))
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getWWanInfo"})
     print("===== Network =====")
     print(f"📨 Public IP Addr: {json.loads(response.text)['info']['public_ip']}")
@@ -63,4 +79,12 @@ if len(sys.argv) == 1:
 else:
     if sys.argv[1] in ["-h", "--help"]:
         print("이 프로그램은 mobileeco 사에서 생산한 ecogate (LG U+ Mobile Router)\n휴대용 라우터의 연결 정보를 확인할 수 있는 프로그램입니다.\n")
+        print("argv[1]: -h, --help - 도움말 표시")
+        print("argv[1]: -p, --password - 와이파이 비밀번호 표시")
+        print("argv[1]: null - 프로그램 실행")
         print("made by Devleo\n\nhttps://github.com/d3vle0")
+    if sys.argv[1] in ["-p", "--password"]:
+        print(colored("🚀 Ecogate Router Info Viewer\n", "green"))
+        response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "netWirelessInfo"})
+        print(f"📌 SSID: {json.loads(response.text)['wifi2Ghz']['ssid']}")
+        print(f"🔐 PW: {json.loads(response.text)['wifi2Ghz']['wpa_passphrase']}")
