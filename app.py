@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 import socket
 from termcolor import colored
+from getpass import getpass
 
 ROUTER_IP_ADDR = "192.168.255.1"
 URL = f"http://{ROUTER_IP_ADDR}/cgi-bin/meco_web_cgi"
@@ -62,12 +63,15 @@ if len(sys.argv) == 1:
     # d 추가할것
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getIndicatorInfo"})
     battery = int(json.loads(response.text)['info']['disp_bat_per'])
-    if battery >= 60:
-        print(colored(f"🔋 Battery: {battery}%\n", "green"))
-    elif battery >= 30 and battery < 60:
-        print(colored(f"🔋 Battery: {battery}%\n", "yellow"))
+    if int(json.loads(response.text)['info']['disp_bat_level']) == 5:
+        print(colored("⚡️ Charging", "cyan"))
     else:
-        print(colored(f"🔋 Battery: {battery}%\n", "red"))
+        if battery >= 60:
+            print(colored(f"🔋 Battery: {battery}%\n", "green"))
+        elif battery >= 30 and battery < 60:
+            print(colored(f"🔋 Battery: {battery}%\n", "yellow"))
+        else:
+            print(colored(f"🔋 Battery: {battery}%\n", "red"))
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getWWanInfo"})
     print("===== Network =====")
     print(f"📨 Public IP Addr: {json.loads(response.text)['info']['public_ip']}")
@@ -85,6 +89,10 @@ else:
         print("made by Devleo\n\nhttps://github.com/d3vle0")
     if sys.argv[1] in ["-p", "--password"]:
         print(colored("🚀 Ecogate Router Info Viewer\n", "green"))
-        response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "netWirelessInfo"})
-        print(f"📌 SSID: {json.loads(response.text)['wifi2Ghz']['ssid']}")
-        print(f"🔐 PW: {json.loads(response.text)['wifi2Ghz']['wpa_passphrase']}")
+        password = getpass("Input Password: ")
+        print(os.environ["HOME"])
+        # export 환경변수를 영구적으로 등록하는 명령어 알아야함
+        if password == os.environ["ROUTER_PASS"]:
+            response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "netWirelessInfo"})
+            print(f"📌 SSID: {json.loads(response.text)['wifi2Ghz']['ssid']}")
+            print(f"🔐 PW: {json.loads(response.text)['wifi2Ghz']['wpa_passphrase']}")
