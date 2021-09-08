@@ -49,6 +49,8 @@ if len(sys.argv) == 1:
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getWWanInfo"})
     print(f"⏰ Uptime: {json.loads(response.text)['info']['h']}h {json.loads(response.text)['info']['m']}m {json.loads(response.text)['info']['s']}s")
     # d 추가할것
+    response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getIndicatorInfo"})
+    print(f"🔋 Battery: {json.loads(response.text)['info']['disp_bat_per']}%")
 else:
     if sys.argv[1] in ["-h", "--help"]:
         print("이 프로그램은 mobileeco 사에서 생산한 ecogate (LG U+ Mobile Router)\n휴대용 라우터의 연결 정보를 확인할 수 있는 프로그램입니다.\n")
