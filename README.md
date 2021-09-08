@@ -1,4 +1,4 @@
-# mobile-router-data-usage
+# ecogate-router
 
 이 프로그램은 mobileeco 사에서 생산한 ecogate (LG U+ Mobile Router) 휴대용 라우터의 데이터 사용량을 확인할 수 있는 프로그램입니다.
 

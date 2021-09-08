@@ -38,14 +38,17 @@ def getHostname(i):
 
 if len(sys.argv) == 1:
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getDataUsageInfo"})
-    print("🚀 Ecogate Router Data Usage Viewer\n")
+    print("🚀 Ecogate Router Info Viewer\n")
     print(f"🔥 Data Usage: {int((json.loads(response.text))['lgdatainfo']['mdatause'])/1000} MB")
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getLanInfo"})
-    print(f"💻 Connected Hosts: ", end="")
+    if len(json.loads(response.text)["wifi2Ghz"]["conn_client"]["conn_list"]) <= 1:
+        print(f"💻 Connected Host: ", end="")
+    else:
+        print(f"💻 Connected Hosts: ", end="")
     print(", ".join(map(getHostname, json.loads(response.text)["wifi2Ghz"]["conn_client"]["conn_list"])))
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getWWanInfo"})
     print(f"⏰ Uptime: {json.loads(response.text)['info']['h']}h {json.loads(response.text)['info']['m']}m {json.loads(response.text)['info']['s']}s")
-
+    # d 추가할것
 else:
     if sys.argv[1] in ["-h", "--help"]:
         print("이 프로그램은 mobileeco 사에서 생산한 ecogate (LG U+ Mobile Router)\n휴대용 라우터의 데이터 사용량을 확인할 수 있는 프로그램입니다.\n")
