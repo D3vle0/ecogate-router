@@ -2,6 +2,7 @@
 import requests
 import json
 import sys
+import socket
 
 cookies = {
     'LiT': 'U',
@@ -27,13 +28,19 @@ headers = {
     'X-Requested-With': 'XMLHttpRequest',
 }
 
-data = {
-  'page': 'getDataUsageInfo'
-}
+def getHostname(i):
+    if i["ip_addr"] == "0.0.0.0":
+        return f"{socket.gethostname()}"
+    return f"{i['hostname']}"
+
 if len(sys.argv) == 1:
-    response = requests.post('http://192.168.255.1/cgi-bin/meco_web_cgi', headers=headers, cookies=cookies, data=data)
-    print("🚀 Ecogate Router Data Usage Viewer")
-    print(f"{int((json.loads(response.text))['lgdatainfo']['mdatause'])/1000} MB used this month")
+    response = requests.post('http://192.168.255.1/cgi-bin/meco_web_cgi', headers=headers, cookies=cookies, data={'page': 'getDataUsageInfo'})
+    print("🚀 Ecogate Router Data Usage Viewer\n")
+    print(f"🔥 Data Usage: {int((json.loads(response.text))['lgdatainfo']['mdatause'])/1000} MB")
+    response = requests.post('http://192.168.255.1/cgi-bin/meco_web_cgi', headers=headers, cookies=cookies, data={'page': 'getLanInfo'})
+    print(f"💻 Connected Hosts: ", end="")
+    print(", ".join(map(getHostname, json.loads(response.text)["wifi2Ghz"]["conn_client"]["conn_list"])))
+
 else:
     if sys.argv[1] in ["-h", "--help"]:
         print("이 프로그램은 mobileeco 사에서 생산한 ecogate (LG U+ Mobile Router)\n휴대용 라우터의 데이터 사용량을 확인할 수 있는 프로그램입니다.\n")
