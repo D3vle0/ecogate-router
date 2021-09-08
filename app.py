@@ -94,10 +94,10 @@ else:
         print("made by Devleo\n\nhttps://github.com/d3vle0")
     if sys.argv[1] in ["-p", "--password"]:
         print(colored("🚀 Ecogate Router Info Viewer\n", "green"))
-        # password = getpass("Input Password: ")
-        print(os.environ["_"])
-        # export 환경변수를 영구적으로 등록하는 명령어 알아야함
-        # if password == os.environ["ROUTER_PASS"]:
-        #     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "netWirelessInfo"})
-        #     print(f"📌 SSID: {json.loads(response.text)['wifi2Ghz']['ssid']}")
-        #     print(f"🔐 PW: {json.loads(response.text)['wifi2Ghz']['wpa_passphrase']}")
+        password = getpass("Input Password: ")
+        if password == os.getenv("PW"):
+            response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "netWirelessInfo"})
+            print(f"📌 SSID: {json.loads(response.text)['wifi2Ghz']['ssid']}")
+            print(f"🔐 PW: {json.loads(response.text)['wifi2Ghz']['wpa_passphrase']}")
+        else:
+            print("❎ Invalid PW")
