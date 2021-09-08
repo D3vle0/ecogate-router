@@ -57,6 +57,9 @@ if len(sys.argv) == 1:
     print(f"📨 Public IP Addr: {json.loads(response.text)['info']['public_ip']}")
     print(f"1️⃣  Primary DNS: {json.loads(response.text)['info']['primary_dns']}")
     print(f"2️⃣  Secondary DNS: {json.loads(response.text)['info']['secondary_dns']}")
+    response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getLanInfo"})
+    print(f"🔌 MAC Addr: {json.loads(response.text)['lan']['macAddr']}")
+
 else:
     if sys.argv[1] in ["-h", "--help"]:
         print("이 프로그램은 mobileeco 사에서 생산한 ecogate (LG U+ Mobile Router)\n휴대용 라우터의 연결 정보를 확인할 수 있는 프로그램입니다.\n")
