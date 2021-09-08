@@ -42,6 +42,11 @@ def getHostname(i):
     return i['hostname']
 
 if len(sys.argv) == 1:
+    try:
+        connected = requests.get(f"http://{ROUTER_IP_ADDR}", verify=False, timeout=3)
+    except:
+        print("❗️ Please connect to your mobile router.")
+        sys.exit(0)
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getDataUsageInfo"})
     print(colored("🚀 Ecogate Router Info Viewer\n", "green"))
     print("===== Basic Information =====")
@@ -64,7 +69,7 @@ if len(sys.argv) == 1:
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getIndicatorInfo"})
     battery = int(json.loads(response.text)['info']['disp_bat_per'])
     if int(json.loads(response.text)['info']['disp_bat_level']) == 5:
-        print(colored("⚡️ Charging", "cyan"))
+        print(colored("⚡️ Charging\n", "cyan"))
     else:
         if battery >= 60:
             print(colored(f"🔋 Battery: {battery}%\n", "green"))
@@ -89,10 +94,10 @@ else:
         print("made by Devleo\n\nhttps://github.com/d3vle0")
     if sys.argv[1] in ["-p", "--password"]:
         print(colored("🚀 Ecogate Router Info Viewer\n", "green"))
-        password = getpass("Input Password: ")
-        print(os.environ["HOME"])
+        # password = getpass("Input Password: ")
+        print(os.environ["_"])
         # export 환경변수를 영구적으로 등록하는 명령어 알아야함
-        if password == os.environ["ROUTER_PASS"]:
-            response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "netWirelessInfo"})
-            print(f"📌 SSID: {json.loads(response.text)['wifi2Ghz']['ssid']}")
-            print(f"🔐 PW: {json.loads(response.text)['wifi2Ghz']['wpa_passphrase']}")
+        # if password == os.environ["ROUTER_PASS"]:
+        #     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "netWirelessInfo"})
+        #     print(f"📌 SSID: {json.loads(response.text)['wifi2Ghz']['ssid']}")
+        #     print(f"🔐 PW: {json.loads(response.text)['wifi2Ghz']['wpa_passphrase']}")
