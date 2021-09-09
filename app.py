@@ -78,7 +78,7 @@ else:
         print(colored("🚀 Ecogate Router Info Viewer\n", "green"))
         password = getpass("Input Password: ")
         if password == os.getenv("PW"):
-            response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "netWirelessInfo"})
+            response = requests.post(URL, data={"page": "netWirelessInfo"})
             print(f"📌 SSID: {json.loads(response.text)['wifi2Ghz']['ssid']}")
             print(f"🔐 PW: {json.loads(response.text)['wifi2Ghz']['wpa_passphrase']}")
         else:
