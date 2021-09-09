@@ -7,6 +7,7 @@ import os
 import socket
 from termcolor import colored
 from getpass import getpass
+import time
 
 ROUTER_IP_ADDR = "192.168.255.1"
 URL = f"http://{ROUTER_IP_ADDR}/cgi-bin/meco_web_cgi"
@@ -42,6 +43,7 @@ def getHostname(i):
     return i['hostname']
 
 if len(sys.argv) == 1:
+    start_time = time.process_time()
     try:
         connected = requests.get(f"http://{ROUTER_IP_ADDR}", verify=False, timeout=3)
     except:
@@ -52,6 +54,7 @@ if len(sys.argv) == 1:
     print("===== Basic Information =====")
     print(f"🔥 Data Usage: {int((json.loads(response.text))['lgdatainfo']['mdatause'])/1000} MB")
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getLanInfo"})
+    macAddr = json.loads(response.text)['lan']['macAddr']
     if len(json.loads(response.text)["wifi2Ghz"]["conn_client"]["conn_list"]) <= 1:
         print(f"💻 Connected Host: ", end="")
     else:
@@ -66,6 +69,9 @@ if len(sys.argv) == 1:
     else:
         print(colored(f"⏰ Uptime: {str(uptime_hour)}h {json.loads(response.text)['info']['m']}m {json.loads(response.text)['info']['s']}s", "green"))
     # d 추가할것
+    pub_ip = json.loads(response.text)['info']['public_ip']
+    primary_dns = json.loads(response.text)['info']['primary_dns']
+    sec_dns = json.loads(response.text)['info']['secondary_dns']
     response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getIndicatorInfo"})
     battery = int(json.loads(response.text)['info']['disp_bat_per'])
     if int(json.loads(response.text)['info']['disp_bat_level']) == 5:
@@ -77,13 +83,13 @@ if len(sys.argv) == 1:
             print(colored(f"🔋 Battery: {battery}%\n", "yellow"))
         else:
             print(colored(f"🔋 Battery: {battery}%\n", "red"))
-    response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getWWanInfo"})
     print("===== Network =====")
-    print(f"📨 Public IP Addr: {json.loads(response.text)['info']['public_ip']}")
-    print(f"1️⃣  Primary DNS: {json.loads(response.text)['info']['primary_dns']}")
-    print(f"2️⃣  Secondary DNS: {json.loads(response.text)['info']['secondary_dns']}")
-    response = requests.post(URL, headers=headers, cookies=cookies, data={"page": "getLanInfo"})
-    print(f"🔌 MAC Addr: {json.loads(response.text)['lan']['macAddr']}")
+    print(f"📨 Public IP Addr: {pub_ip}")
+    print(f"1️⃣  Primary DNS: {primary_dns}")
+    print(f"2️⃣  Secondary DNS: {sec_dns}")
+    print(f"🔌 MAC Addr: {macAddr}")
+    end_time = time.process_time()
+    print(f"time elapsed : {int(round((end_time - start_time) * 1000))}ms")
 
 else:
     if sys.argv[1] in ["-h", "--help"]:
