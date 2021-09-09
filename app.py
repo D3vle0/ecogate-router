@@ -74,7 +74,9 @@ else:
         print("argv[1]: -p, --password - 와이파이 비밀번호 표시")
         print("argv[1]: null - 프로그램 실행")
         print("made by Devleo\n\nhttps://github.com/d3vle0")
+    
     if sys.argv[1] in ["-p", "--password"]:
+        start_time = time.process_time()
         print(colored("🚀 Ecogate Router Info Viewer\n", "green"))
         password = getpass("Input Password: ")
         if password == os.getenv("PW"):
@@ -83,3 +85,5 @@ else:
             print(f"🔐 PW: {json.loads(response.text)['wifi2Ghz']['wpa_passphrase']}")
         else:
             print("❎ Invalid PW")
+        end_time = time.process_time()
+        print(f"⏳ Time Elapsed : {int(round((end_time - start_time) * 1000))}ms")
