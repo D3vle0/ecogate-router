@@ -16,7 +16,9 @@ load_dotenv(verbose=True)
 def getHostname(i):
     if i["ip_addr"] == "0.0.0.0" and i["mac_addr"] == os.getenv("MY_MAC_ADDR"):
         return socket.gethostname()
-    return i['hostname']
+    if not i["hostname"]:
+        return "unknown"
+    return i["hostname"]
 
 if len(sys.argv) == 1:
     start_time = time.process_time()
